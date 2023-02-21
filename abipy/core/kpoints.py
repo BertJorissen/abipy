@@ -13,7 +13,6 @@ from monty.collections import AttrDict, dict2namedtuple
 from monty.functools import lazy_property
 from monty.string import marquee
 from pymatgen.core.lattice import Lattice
-from pymatgen.util.serialization import pmg_serialize
 from abipy.iotools import ETSF_Reader
 from abipy.tools.derivatives import finite_diff
 from abipy.tools.numtools import add_periodic_replicas, is_diagonal
@@ -44,6 +43,24 @@ _ATOL_KDIFF = 1e-8
 # Tolerances passed to spglib.
 _SPGLIB_SYMPREC = 1e-5
 _SPGLIB_ANGLE_TOLERANCE = -1.0
+
+# taken from pymatgen.utils.serialization, consider move to monty.serialization
+def pmg_serialize(method):
+    """
+    Decorator for methods that add MSON serializations keys
+    to the dictionary. See documentation of MSON for more details
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        d = method(*args, **kwargs)
+        # Add @module and @class
+        d["@module"] = type(self).__module__
+        d["@class"] = type(self).__name__
+        return d
+
+    return wrapper
 
 
 def set_atol_kdiff(new_atol):
