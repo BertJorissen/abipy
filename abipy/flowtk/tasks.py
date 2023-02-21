@@ -25,7 +25,6 @@ from monty.json import MSONable
 from monty.fnmatch import WildCard
 from pymatgen.core.units import Memory
 from pymatgen.core.structure import Structure as pmg_Structure
-from pymatgen.util.serialization import json_pretty_dump, pmg_serialize
 from abipy.core.globals import get_workdir
 from abipy.tools.iotools import yaml_safe_load
 from .utils import File, Directory, irdvars_for_ext, abi_splitext, FilepathFixer, Condition, SparseHistogram
@@ -67,6 +66,35 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Tools and helper functions.
+
+# taken from pymatgen.utils.serialization, consider move to monty.serialization
+import functools
+def pmg_serialize(method):
+    """
+    Decorator for methods that add MSON serializations keys
+    to the dictionary. See documentation of MSON for more details
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        d = method(*args, **kwargs)
+        # Add @module and @class
+        d["@module"] = type(self).__module__
+        d["@class"] = type(self).__name__
+        return d
+
+    return wrapper
+
+
+# taken from pymatgen.utils.serialization, consider move to monty.serialization
+def json_pretty_dump(obj, filename):
+    """
+    Serialize obj as a JSON formatted stream to the given filename (
+    pretty printing version)
+    """
+    with open(filename, "w") as fh:
+        json.dump(obj, fh, indent=4, sort_keys=4)
 
 
 def straceback():
