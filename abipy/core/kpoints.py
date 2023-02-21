@@ -45,6 +45,7 @@ _SPGLIB_SYMPREC = 1e-5
 _SPGLIB_ANGLE_TOLERANCE = -1.0
 
 # taken from pymatgen.utils.serialization, consider move to monty.serialization
+import functools
 def pmg_serialize(method):
     """
     Decorator for methods that add MSON serializations keys
