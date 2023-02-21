@@ -21,7 +21,6 @@ from monty.collections import AttrDict, dict2namedtuple
 from monty.functools import lazy_property
 from monty.termcolor import cprint
 from pymatgen.core.units import eV_to_Ha, bohr_to_angstrom, Energy
-from pymatgen.util.serialization import pmg_serialize
 from abipy.flowtk import AnaddbTask
 from abipy.core.mixins import TextFile, Has_Structure, NotebookWriter
 from abipy.core.symmetries import AbinitSpaceGroup
@@ -42,6 +41,24 @@ from abipy.tools.iotools import ExitStackWithFiles
 from abipy.tools.tensors import DielectricTensor, ZstarTensor, Stress
 from abipy.abio.robots import Robot
 
+# taken from pymatgen.utils.serialization, consider move to monty.serialization
+import functools
+def pmg_serialize(method):
+    """
+    Decorator for methods that add MSON serializations keys
+    to the dictionary. See documentation of MSON for more details
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        d = method(*args, **kwargs)
+        # Add @module and @class
+        d["@module"] = type(self).__module__
+        d["@class"] = type(self).__name__
+        return d
+
+    return wrapper
 
 SUBSCRIPT_UNICODE = {
                 "0": "₀",
