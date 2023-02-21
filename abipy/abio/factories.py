@@ -13,11 +13,29 @@ from collections import namedtuple
 from monty.collections import AttrDict
 from monty.string import is_string
 from monty.json import jsanitize, MontyDecoder, MSONable
-from pymatgen.util.serialization import pmg_serialize
 from pymatgen.io.abinit.pseudos import PseudoTable
 from abipy.core.structure import Structure
 from abipy.abio.inputs import AbinitInput, MultiDataset
 
+
+# taken from pymatgen.utils.serialization, consider move to monty.serialization
+import functools
+def pmg_serialize(method):
+    """
+    Decorator for methods that add MSON serializations keys
+    to the dictionary. See documentation of MSON for more details
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        d = method(*args, **kwargs)
+        # Add @module and @class
+        d["@module"] = type(self).__module__
+        d["@class"] = type(self).__name__
+        return d
+
+    return wrapper
 
 __all__ = [
     "gs_input",
