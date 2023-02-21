@@ -23,7 +23,6 @@ from monty.collections import dict2namedtuple
 from monty.string import is_string, list_strings
 from monty.json import MontyDecoder, MSONable
 from pymatgen.core.units import Energy
-from pymatgen.util.serialization import pmg_serialize
 from pymatgen.symmetry.bandstructure import HighSymmKpath
 from abipy.tools.numtools import is_diagonal
 from abipy.core.structure import Structure
