@@ -23,7 +23,6 @@ from monty.json import MontyEncoder
 from monty.collections import AttrDict, dict2namedtuple
 from monty.functools import lazy_property
 from monty.bisect import find_le, find_gt
-from pymatgen.util.serialization import pmg_serialize
 from pymatgen.electronic_structure.core import Spin as PmgSpin
 from abipy.core.func1d import Function1D
 from abipy.core.mixins import Has_Structure, NotebookWriter
@@ -39,6 +38,25 @@ from abipy.tools.plotting import (set_axlims, add_fig_kwargs, get_ax_fig_plt, ge
     get_ax3d_fig_plt, rotate_ticklabels, set_visible, plot_unit_cell, set_ax_xylabels, get_figs_plotly,
     get_fig_plotly, add_plotly_fig_kwargs, PlotlyRowColDesc, plotly_klabels, plotly_set_lims)
 
+
+# taken from pymatgen.utils.serialization, consider move to monty.serialization
+import functools
+def pmg_serialize(method):
+    """
+    Decorator for methods that add MSON serializations keys
+    to the dictionary. See documentation of MSON for more details
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        self = args[0]
+        d = method(*args, **kwargs)
+        # Add @module and @class
+        d["@module"] = type(self).__module__
+        d["@class"] = type(self).__name__
+        return d
+
+    return wrapper
 
 __all__ = [
     "ElectronBands",
